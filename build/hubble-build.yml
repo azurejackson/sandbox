@@ -1,0 +1,31 @@
+# Christopher Jackson
+#
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+name: Hubble_Build_$(date:yyyyMMdd)$(rev:.r)
+
+trigger:
+- none
+
+pool:
+  #name: 'Self-Hosted' (Self-hosted build agent)
+  vmImage: 'ubuntu-latest' # (use this for the Microsoft-hosted build agent)
+
+steps:
+# Create the Hubble Linux VM image
+- task: PackerBuild@1
+  displayName: 'Create Hubble image'
+  inputs:
+    templateType: 'builtin'
+    ConnectedServiceName: 'Sandbox Connection'
+    isManagedImage: true
+    managedImageName: $(imageName)
+    location: 'eastus2'
+    storageAccountName: '<storage-account-name>'
+    azureResourceGroup: '<images-resource-group>'
+    baseImageSource: 'default'
+    baseImage: 'Canonical:UbuntuServer:18.04-LTS:linux'
+    packagePath: '$(System.DefaultWorkingDirectory)/sandbox'
+    deployScriptPath: 'release/scripts/hello-world.ps1'
+    imageUri: 'sandbox-vm-image1'
+    imageId: 'sandbox-vm-image-resource-id'

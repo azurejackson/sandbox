@@ -1,0 +1,30 @@
+# Christopher Jackson
+#
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+name: Sandy_Build_$(date:yyyyMMdd)$(rev:.r)
+
+trigger:
+- none
+
+pool:
+  #name: 'Self-Hosted' (Self-hosted build agent)
+  vmImage: 'ubuntu-latest' # (use this for the Microsoft-hosted build agent)
+
+steps:
+# Create the Windows Sandy Image
+- task: PackerBuild@1
+  displayName: "Build Sandy Image"
+  inputs:
+    templateType: 'builtin'
+    ConnectedServiceName: 'Sandbox'
+    isManagedImage: true
+    managedImageName: $(imageName)
+    location: 'eastus2'
+    storageAccountName: '<storage-account-name>'
+    azureResourceGroup: '<images-resource-group>'
+    baseImageSource: 'default'
+    baseImage: 'MicrosoftWindowsDesktop:Windows-10:20h1-pro-g2:windows'
+    packagePath: '$(System.DefaultWorkingDirectory)/sandbox'
+    deployScriptPath: 'release/scripts/hello-world.ps1'
+    additionalBuilderParameters: '{"vm_size":"Standard_D2s_v3"}'
